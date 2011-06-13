@@ -1,73 +1,174 @@
 <?php
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- * Description of ExceptionHandler
+/*This class is Exception Main class.Custom exceptions are 
+ * defined here which were extended from Base class Exception.
  *
- * @author Dishna
+ * @author Nirav Patel
  */
-//This class has method for handling exceptions and logging it into Text file.
-class ExceptionHandler {
-    //put your code here
-    //Logging exceptions/error
-    function logError($anyError) 
+
+/*This function is custom error handler to catch warnings,notices.*/
+function customError($errno, $errstr,$errfile,$errline,$errcontext)
+{
+    switch ($errno)
     {
-        
-        $traceError = $anyError->getTrace();
-        $errorInfo = array("Message: " . $anyError->getMessage(),
-        "File: " . $anyError->getFile(),
-        "Thrown on line: " . $anyError->getLine(),
-        "Code: " . $anyError->getCode(),
-        "Called by function: " . $traceError[0]['function'],
-        "On line: " . $traceError[0]['line'],
-        "in " . $traceError[0]['file'],
-        "Classification: " . $this->classify($anyError->getCode()));
-        //Write this into text file.
-        //echo $errorInfo;
-        echo 'writing to Log file.Please check Log file for details.<br>';
-        $this->WriteErrorToTextFile($errorInfo);
+    case E_WARNING:
+    $message="Warning: " .$errstr . " , File :".$errfile." , Line Number :".$errline." ,Context :".$errcontext."\n";
+    error_log($message, 3, "Error_log.txt");
     }
-    //Log warnings /failures
-    function classify($code)
+}
+set_error_handler("customError");  
+
+##Region Custom Excpetion
+/*File not found exception*/
+class FileNotFoundException extends Exception
+{
+     function __autoload($className)
+{
+     require_once  "$className.php";
+}
+    public function __construct( $message ) 
     {
-        if($code <= 110)
-        {
-        $classify = "Warning";
-        }
-        if($code > 110 && $code <= 120)
-        {
-        $classify = "Severe";
-        }
-        return $classify;
+    parent::__construct( $message );
+    $obj=new ErrorLogging();
+    echo 'code'. $this->getcode();
+    $obj->logError($this);
+
     }
-   //Write error message to Text file.
-    public function WriteErrorToTextFile($errorInfo) 
+}
+/*File not readbale exception*/
+class FileNotReadble extends Exception
+{
+    public function __construct( $message ) 
     {
-    if(!file_exists("Error_Log.txt"))
-        {
-           //Create and Write
-        Echo 'Log file does not Exist ,Log file Created.,<br>';
-       $file=fopen("Error_Log.txt","w");
-        //$message = 'HellO I am appending...';
-        //echo '<b>'.'File :'.$e->getFile().'<br />';
-        fwrite($file,"$errorInfo[0] , $errorInfo[1] , $errorInfo[2] ,$errorInfo[3] ,$errorInfo[4] ,$errorInfo[5] ,$errorInfo[6] \n");
-        fclose($file);
-        }
-        else
-        {
-           //Write Append.
-         $file=fopen("Error_Log.txt","a+");
-        //$message = 'HellO I am appending...';
-        //echo '<b>'.'File :'.$e->getFile().'<br />';
-        fwrite($file,"$errorInfo[0] , $errorInfo[1] , $errorInfo[2] ,$errorInfo[3] ,$errorInfo[4] ,$errorInfo[5] ,$errorInfo[6] \n");
-        fclose($file);
-        }
+    parent::__construct( $message );
+    $obj=new ErrorLogging();
+    $obj->logError($this);
+
+    }
+}
+/*Directory not found exception*/
+class DirectoryNotFoundException extends Exception
+{
+    public function __construct( $message ) 
+    {
+    parent::__construct( $message );
+    $obj=new ErrorLogging();
+    $obj->logError($this);
+
+    }
+}
+/*EndofFile exception */
+class EndofFileException extends Exception
+{
+    public function __construct( $message ) 
+    {
+    parent::__construct( $message );
+    $obj=new ErrorLogging();
+    $obj->logError($this);
+
+    }
+}
+/*FileLoad Exception class*/
+class FileLoadException extends Exception
+{
+    public function __construct( $message ) 
+    {
+    parent::__construct( $message);
+    $obj=new ErrorLogging();
+    $obj->logError($this);
+
+    }
+}
+/*Directory Already exists Exception*/
+class DirectoryExistsException extends Exception
+{
+    public function __construct( $message ) 
+    {
+    parent::__construct( $message );
+    $obj=new ErrorLogging();
+    $obj->logError($this);
+
+    }
+}
+/*File Already Exists exception */
+class FileAlreadyExistsException extends Exception
+{
+    public function __construct( $message ) 
+    {
+    parent::__construct( $message );
+    $obj=new ErrorLogging();
+    $obj->logError($this);
+
+    }
+}
+/*Permission denied exception --No permission to open file/directory */
+class PermissionDeniedException extends Exception
+{
+    public function __construct( $message ) 
+    {
+    parent::__construct( $message);
+    $obj=new ErrorLogging();
+    $obj->logError($this);
+
     }
 
 }
+/*File not writable exception */
+class FileNotWritableException extends Exception
+{
+    public function __construct( $message ) 
+    {
+    parent::__construct( $message);
+    $obj=new ErrorLogging();
+    $obj->logError($this);
+
+    }
+}
+
+/*Invalid Tag Exception*/
+class InvalidTagNameException extends Exception
+{
+    public function __construct($message) 
+    {
+    parent::__construct($message);
+    $obj=new ErrorLogging();
+    $obj->logError($this);
+
+    }
+}
+/*Invalid Attributes Exceptions*/
+class InvalidAttributeException extends Exception
+{
+    public function __construct( $message) 
+    {
+    parent::__construct( $message);
+    $obj=new ErrorLogging();
+    $obj->logError($this);
+
+    }
+}
+/*Invalid Content Exceptions*/
+class InvalidContentException extends Exception
+{
+    public function __construct( $message) 
+    {
+    parent::__construct( $message);
+    $obj=new ErrorLogging();
+    $obj->logError($this);
+
+    }
+}
+/*General Exception if NO match occured */
+class GeneralException extends Exception
+{
+    public function __construct( $message) 
+    {
+    parent::__construct( $message);
+    $obj=new ErrorLogging();
+    echo 'code'. $this->getcode();
+    $obj->logError($this);
+    
+    }
+}
+#End Region 
 
 ?>

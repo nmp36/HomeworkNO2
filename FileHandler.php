@@ -1,113 +1,250 @@
 <?php
-//include ("ExceptionHandler.php"); 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * This class has basic file opeations listed.
+ *Call matching exception from Exception handler upon exception generated.
+ * @author Nirav Patel
  */
 
-/**
- * Description of FileHandler
- *
- * @author Dishna
- */
-class FileHandler {
+class FileHandler
+{ 
     private $file;
     private $fileDir;
     private $ExcepHand;
-    public function __construct($file)
+    private $path;
+
+    public function __construct()
     {
-        try
+    if (empty($_GET["FileName"]))
+    {
+        Echo 'Please Enter file name to check.<br>';
+    }
+    else
+    {
+        $fileop=new FileOperation();
+        $this->thisdir = getcwd();
+        $path=$this->thisdir.'\\'.$_GET["FileName"];
+
+        try {
+        @$fileop->isFileExists($path);
+        $fileop->readFileintoArray($path);
+        $fileop->readLineByLineFromFile($path);
+        $fileop->AppendtoFile($path);
+        $fileop->DelelteFile($_GET["DelFile"]);
+        $fileop->getAllfilesFromDirectory($_GET["DirName"]);
+        $fileop->CreateDirectory($_GET["NewDirName"]);
+        $fileop->ReadCSVFile($path);
+        $fileop->readXMLFile($path);
+        }
+        catch(FileNotFoundException $e)
         {
-        $this->ExcepHand = new ExceptionHandler();
+        Echo 'Severe Error Occured : File not Found.'; 
+        }
+        catch(FileLoadException $e)
+        {
+        Echo 'Error in loading file..';  
+        }
+        catch(DirectoryExistsException $e)
+        {
+        Echo 'Directory already exists..';  
+        }
+        catch(FileAlreadyExistsException $e)
+        {
+        Echo 'File already exists..';  
+        }
+        catch(FileNotReadble $e)
+        {
+        Echo 'File is not readble..';  
+        }
+        catch(FileAlreadyExistsException $e)
+        {
+        Echo 'File is not writable...';  
+        }
+        catch(GeneralException $e)
+        {
+        Echo 'Error occured in Processing request...';  
+        }
+        catch(DirectoryNotFoundException $e)
+        {
+        Echo 'Directory not found..';  
+        }
+        }
+    }
+
+}
+class FileOperation
+{
+ /*Check to see file exists*/
+    Public function isFileExists($file)
+    {
         if(!file_exists($file))
         {
-        throw new Exception('File '.$file.' not found');
-        }
-        $this->file=$file;
-        }
-       catch(Exception $e) 
-        {
-         $this->ExcepHand->logError($e);    
-        }
-    }
-    
-    public function getContent()
-    {
-        try
-        {
-        if(!$content=file_get_contents($this->file))
-        {
-        throw new Exception('Unable to read file contents.');
-        }
-        return $content;
-        }
-        catch(Exception $e)
-        {
-         $this->ExcepHand->logError($e);   
-        }
-    }
-    /*Normal file operation */
-    Public function fileOperations()
-    {
-        /*check if file exists -- Same function to check directory /file*/
-        if(!file_exists($this->file))
-        {
-            echo 'file ' . $this->file . 'exists<br>';
+        throw new FileNotFoundException('File '.$file.' not found');
+        return true;
         }
         else
         {
-         echo 'file ' . $this->file .'does not exist<br>';   
-            
+        return true;           
         }
-        
-        /*check to if FILE.Direcorty readble exists */
-      
     }
+
     /*check to see if file can be readble */
     public function isReadble($file)
     {
-        
-        if (is_readable($file)) 
+        if (!is_readable($file)) 
         {
-        echo 'The file is readable.<br>';
-
-        } else 
+        throw new FileNotReadble('File '.$file.' not Readble.<br>');
+        return true;
+        }
+        else
         {
-
-        echo 'The file is not readable.<br>';
-
+        return true;
         }
     }
     /*check to see if file is wrtiable */
     public function isWritable($file)
     {
-        
-        if (is_writable($file)) 
+        if (!is_writable($file)) 
         {
-        echo 'The file is writable. <br>';
-        } else 
-        {
-        echo 'The file is not writable.<br>';
+        throw new FileNotWritableException('The file is' .$file. 'not writable.<br>');
         }
-
+        return true;
     }
-   /*READ FIle into arrary*/
+    /*Read file into string */
+    public function readFileintoString($file)
+    {
+        if($this->isFileExists($file))
+        {
+        if(!$content=file_get_contents($file))
+        {
+        throw new FileLoadException('Unable to read file contents.');
+        }
+        echo $content;
+        return $content;
+        }
+    }
+
+    /*READ FIle into arrary*/
     public function readFileintoArray($file)
     {
-        $file_handle = fopen($file, "rb");
-        while (!feof($file_handle) ) 
+        if($this->isFileExists($file))
         {
-        $line_of_text = fgets($file_handle);
-        $parts = explode('=', $line_of_text);
-        echo $parts[0] . $parts[1]. "<BR>";
+        echo 'file path '.$file;
+        if($this->isReadble($file))
+        {
+        $file_handle = file($file, FILE_USE_INCLUDE_PATH | FILE_SKIP_EMPTY_LINES);
+        if (!$file_handle)
+        {
+         throw new GeneralException('Unable to read file into Array.');    
         }
-        fclose($file_handle);
+        foreach ( $file_handle as $line ) 
+        echo $line . "<br />";
+        }
+        }
+    }
+    /*Reading single line from file. */
+    public function readLineByLineFromFile($file)
+    {
+        if($this->isFileExists($file))
+        {
+        if($this->isReadble($file))
+        {
+        /* @var $file_handle type */
+        $file_handle = fopen($file);
+
+        if ($file_handle)
+        {
+        while (($buffer = fgets($handle, 4096)) !== false)
+        {
+        echo $buffer;
+        }
+        if (!feof($handle))
+        {
+        throw new GeneralException("Error: unexpected fgets() fail\n");
+        }
+        fclose($handle);
+        }
+        }
+        }
+    }
+    /*reading csv file */
+    public function ReadCSVFile($file)
+    {
+        $row = 1;
+        if($this->isFileExists($file))
+        {
+        if (($handle = fopen("sampleCSV.CSV", "r")) !== FALSE) 
+        {
+        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE)
+        {
+        $num = count($data);
+        echo "<p> $num fields in line $row: <br /></p>\n";
+        $row++;
+        for ($c=0; $c < $num; $c++) {
+        echo $data[$c] . "<br />\n";
+        }
+        }
+        fclose($handle);
+        }
+        }
+    }
+    /*Read XML file */
+    public function readXMLFile($file)
+    {
+        if($this->isFileExists($file))
+        {
+        $xml = simplexml_load_file($file);
+        if($xml)
+        {
+        echo $xml->getName() . "<br />";
+        foreach($xml->children() as $child)
+        {
+        echo $child->getName() . ": " . $child . "<br />";
+        }   
+        }
+        else
+        {
+           throw new FileLoadException("Not able to Load XML file :".$file ."<br>");
+        }
+        }
+    }
+    /*Append data to existing file */
+    public function AppendtoFile($file)
+    {
+        if($this->isFileExists($file))
+        {
+        $file=fopen($file,"a+");
+
+        if($file)
+        {
+        $message = 'HellO I am appending.';
+        echo 'Appending file'. '<br>';
+        fwrite($file,"$message\n");
+        fclose($file);
+        }
+        else
+        {
+        throw new FileLoadException("Unable to open file : ". $file ."<br>");   
+        }
+        }
+    }
+    /*Create Directory */
+    public function CreateDirectory($Dirname)
+    {
+        $thisdir = getcwd();
+        Echo 'here in '.$Dirname;
+        /* Step 2. From this folder, I want to create a subfolder called "myfiles".  Also, I want to try and make this folder world-writable (CHMOD 0777). Tell me if success or failure... */
+        if(mkdir($thisdir ."/".$Dirname , 0777))
+        {
+        echo "Directory has been created successfully... <br>";
+        }
+        else
+        {
+        throw new DirectoryExistsException("Failed to create directory : Directory Already Exists :". $Dirname ."<br>");
+        } 
     }
     /*LIST ALL FILES FORM Directory */
     public  function getAllfilesFromDirectory($DirName)
     {
-        try
-        {
         $handle = opendir($DirName);
         if ($handle) 
         {
@@ -123,103 +260,24 @@ class FileHandler {
         }
         else
         {
-         throw new Exception('Unable to open Directory!');   
-        }
-        }
-        catch(Exception $e)
-        {
-         $this->ExcepHand->logError($e);            
-        }
-    }
-    /*Append data to file */
-    public function AppendtoFile($file)
-    {
-        try
-        {
-        $file=fopen($file,"a+");
-        if($file)
-        {
-        $message = 'HellO I am appending...';
-        echo 'Appending file <br>';
-        fwrite($file,"\n $message");
-        fclose($file);
-        }
-        else
-        {
-            throw new Exception('Unable to open file!');   
-        }
-        }
-        catch(Eception $e)
-        {
-         $this->ExcepHand->logError($e);   
-        }
-        }
-    /*Creat eDirectory */
-    public function CreateDirectory()
-    {
-        try
-        {
-        $thisdir = getcwd();
-        /* Step 2. From this folder, I want to create a subfolder called "myfiles".  Also, I want to try and make this folder world-writable (CHMOD 0777). Tell me if success or failure... */
-        if(mkdir($thisdir ."/TestFiles" , 0777))
-        {
-        echo "Directory has been created successfully... <br>";
-        }
-        else
-        {
-        throw new Exception('Failed to create directory...');
-        } 
-        }
-        catch(Exception $e)
-        {
-         $this->ExcepHand->logError($e);   
+        throw new FileLoadException("Unable to open Directory :" .$DirName . "<br>");   
         }
     }
     /*removing or deleting file   */
-    var $str='File deleted Successfully.';
     public function  DelelteFile($file)
     {
+        if($this->isFileExists($file))
+        {
         $unlink = unlink($file);
         if ($unlink)
         {
-
         echo "File deleted Successfully...<br>";
-        //return  $this->str;
-
         }
         else
         {
-        //return  $this->str;
-        throw new Exception('Failed to delete file.'); 
+        throw new GeneralException("Failed to delete file :".$file. "<br>"); 
+        }
         }
     }
-    /*
-    * Read file line by line */
-    Public function getFileLinebyLine($file)
-    {
-        try
-        {
-        $file = fopen($file, "r");
-        if ($file)
-        {
-        //Output a line of the file until the end is reached
-            echo 'Reading file line by line. <br>';
-            while(!feof($file))
-            {
-            echo fgets($file). "<br />";
-            }
-            fclose($file);
-            }
-        else
-        {
-            throw new Exception('Unable to open file!');   
-        }
-        }
-        catch(Exception $e)
-        {
-        $this->ExcepHand->logError($e);
-        }
-      }
-    
-}
+  }
 ?>
