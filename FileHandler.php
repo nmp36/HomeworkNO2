@@ -5,6 +5,8 @@
  * @author Nirav Patel
  */
 
+
+
 class FileHandler
 { 
     private $file;
@@ -25,7 +27,7 @@ class FileHandler
         $path=$this->thisdir.'\\'.$_GET["FileName"];
 
         try {
-        @$fileop->isFileExists($path);
+        $fileop->isFileExists($path);
         $fileop->readFileintoArray($path);
         $fileop->readLineByLineFromFile($path);
         $fileop->AppendtoFile($path);
