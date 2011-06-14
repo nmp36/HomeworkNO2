@@ -3,8 +3,19 @@
  This class is used for logging error in specified Text file.
  @author Nirav Patel
  */
-class ErrorLogging
+interface IErrorHandler
 {
+function __construct($any_error);
+}
+/*Class Implements Interface*/
+class ErrorLogging implements IErrorHandler
+{
+    private $errorObj;
+    public function __construct($any_error)
+    {
+    $this->errorObj=$any_error;
+    $this->logError($this->errorObj);
+    }
     /*Prepeare  error Information */
     function logError($anyError) 
     {
