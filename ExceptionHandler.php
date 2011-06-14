@@ -21,17 +21,10 @@ set_error_handler("customError");
 /*File not found exception*/
 class FileNotFoundException extends Exception
 {
-     function __autoload($className)
-{
-     require_once  "$className.php";
-}
     public function __construct( $message ) 
     {
     parent::__construct( $message );
-    $obj=new ErrorLogging();
-    echo 'code'. $this->getcode();
-    $obj->logError($this);
-
+    $obj=new ErrorLogging($this);
     }
 }
 /*File not readbale exception*/
@@ -40,9 +33,7 @@ class FileNotReadble extends Exception
     public function __construct( $message ) 
     {
     parent::__construct( $message );
-    $obj=new ErrorLogging();
-    $obj->logError($this);
-
+    $obj=new ErrorLogging($this);
     }
 }
 /*Directory not found exception*/
@@ -51,8 +42,7 @@ class DirectoryNotFoundException extends Exception
     public function __construct( $message ) 
     {
     parent::__construct( $message );
-    $obj=new ErrorLogging();
-    $obj->logError($this);
+    $obj=new ErrorLogging($this);
 
     }
 }
@@ -62,8 +52,7 @@ class EndofFileException extends Exception
     public function __construct( $message ) 
     {
     parent::__construct( $message );
-    $obj=new ErrorLogging();
-    $obj->logError($this);
+    $obj=new ErrorLogging($this);
 
     }
 }
@@ -73,8 +62,7 @@ class FileLoadException extends Exception
     public function __construct( $message ) 
     {
     parent::__construct( $message);
-    $obj=new ErrorLogging();
-    $obj->logError($this);
+    $obj=new ErrorLogging($this);
 
     }
 }
@@ -84,8 +72,7 @@ class DirectoryExistsException extends Exception
     public function __construct( $message ) 
     {
     parent::__construct( $message );
-    $obj=new ErrorLogging();
-    $obj->logError($this);
+    $obj=new ErrorLogging($this);
 
     }
 }
@@ -95,8 +82,7 @@ class FileAlreadyExistsException extends Exception
     public function __construct( $message ) 
     {
     parent::__construct( $message );
-    $obj=new ErrorLogging();
-    $obj->logError($this);
+   $obj=new ErrorLogging($this);
 
     }
 }
@@ -106,8 +92,7 @@ class PermissionDeniedException extends Exception
     public function __construct( $message ) 
     {
     parent::__construct( $message);
-    $obj=new ErrorLogging();
-    $obj->logError($this);
+   $obj=new ErrorLogging($this);
 
     }
 
@@ -118,8 +103,7 @@ class FileNotWritableException extends Exception
     public function __construct( $message ) 
     {
     parent::__construct( $message);
-    $obj=new ErrorLogging();
-    $obj->logError($this);
+   $obj=new ErrorLogging($this);
 
     }
 }
@@ -130,8 +114,7 @@ class InvalidTagNameException extends Exception
     public function __construct($message) 
     {
     parent::__construct($message);
-    $obj=new ErrorLogging();
-    $obj->logError($this);
+    $obj=new ErrorLogging($this);
 
     }
 }
@@ -141,8 +124,7 @@ class InvalidAttributeException extends Exception
     public function __construct( $message) 
     {
     parent::__construct( $message);
-    $obj=new ErrorLogging();
-    $obj->logError($this);
+   $obj=new ErrorLogging($this);
 
     }
 }
@@ -152,8 +134,7 @@ class InvalidContentException extends Exception
     public function __construct( $message) 
     {
     parent::__construct( $message);
-    $obj=new ErrorLogging();
-    $obj->logError($this);
+    $obj=new ErrorLogging($this);
 
     }
 }
@@ -163,10 +144,7 @@ class GeneralException extends Exception
     public function __construct( $message) 
     {
     parent::__construct( $message);
-    $obj=new ErrorLogging();
-    echo 'code'. $this->getcode();
-    $obj->logError($this);
-    
+    $obj=new ErrorLogging($this);
     }
 }
 #End Region 
