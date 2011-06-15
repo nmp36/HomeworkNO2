@@ -9,16 +9,20 @@
     <form action="index.php" method="get">
     <body>
         <?php
+        function __autoload($class_name) {
+include $class_name . '.php';
+}
         /*I tried below function but does not work in case of Custom extends classes for exception.
-        function __autoload($className)
+        
+         * function __autoload($className)
         {
         require_once "$className.php";
         }*/
         //This is manually Added for timebeing.
-        include 'HTMLTagCreator.php';
-        include 'ExceptionHandler.php';
-        include 'ErrorLogging.php';
-        include 'FileHandler.php';
+//        include 'HTMLTagCreator.php';
+//        //include 'ExceptionHandler.php';
+//        include 'ErrorLogging.php';
+//        include 'FileHandler.php';
 
         $fr = new FileHandler();
         $htmlTag = new HTMLTagCreator();
